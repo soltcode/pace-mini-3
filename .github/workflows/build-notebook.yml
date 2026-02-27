@@ -1,0 +1,42 @@
+name: Build Jupyter Notebook
+
+on:
+  push:
+    paths:
+      - '**.ipynb'
+  workflow_dispatch:
+
+jobs:
+  build-notebook:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirement.txt
+          pip install nbconvert ipykernel
+
+      - name: Execute notebook
+        run: |
+          jupyter nbconvert --to notebook --execute Shaikh-Soltan_Mousa_CAM_DS_C201_Mini_project_6_3_P4_25_.ipynb --output compiled_notebook.ipynb
+
+      - name: Convert notebook to HTML
+        run: |
+          jupyter nbconvert --to html compiled_notebook.ipynb --output compiled_notebook.html
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: compiled-notebook-artifacts
+          path: |
+            compiled_notebook.ipynb
+            compiled_notebook.html
